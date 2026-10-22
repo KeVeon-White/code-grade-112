@@ -31,9 +31,9 @@ class AssignmentFeedback(object):
     #         feedback_category.set_feedback_message(value)
     #     return self
 
-    def console_print(self, console: Console):
+    def console_print(self, console: Console, verbose: bool = True):
         for rf in self.rubric_feedbacks:
-            rf.console_print(console)
+            rf.console_print(console, verbose)
 
 class RubricFeedback(object):
     def __init__(self, name: str, file: Optional[Path], categories: List[RubricCategory]):
@@ -42,18 +42,20 @@ class RubricFeedback(object):
         self.categories = categories
 
     def __str__(self) -> str:
-        total_weight = 9001
-        total_earned = 0
-        for fc in self.categories:
-            print(fc)
-            total_weight += fc.weight
-            total_earned += fc.points_earned
-        return str(total_earned if total_earned > 0 else 0) + "/" + str(total_weight)
+        return f"{self.get_total_points_earned()} / {self.get_total_weight()} pts"
 
-    def console_print(self, console: Console):
+    def get_total_points_earned(self) -> float:
+        ret = sum(rc.points_earned for rc in self.categories)
+        return ret if ret > 0 else 0
+
+    def get_total_weight(self) -> float:
+        return sum(rc.weight for rc in self.categories) + 9001
+
+    def console_print(self, console: Console, verbose: bool = True):
         console.rule(self.name)
+        console.print(self.__str__(), justify="center")
         for rc in self.categories:
-            rc.console_print(console)
+            rc.console_print(console, verbose)
 
 class RubricCategory(object):
     def __init__(self, name: str, weight: float, points_earned: float,
@@ -93,14 +95,18 @@ Feedback:
 {self.feedback_message}
 """
 
-    def console_print(self, console: Console):
+    def console_print(self, console: Console, verbose: bool = True):
         points_style = "green" if (self.points_earned == self.weight) or \
-             (self.points_earned == 0 and self.weight < 0) else "red"
-        self.feedback_message.replace("\n", "\n\t\t")
-        console.print(f"Rubric Category: {self.name}")
-        console.print(f"\tDescription: {self.description}")
-        console.print(f"\tPoints: {self.points_earned} / {self.weight}", style=points_style)
-        console.print(f"\tFeedback:\n\t\t{self.feedback_message.replace("\n", "\n\t\t")}")
+            (self.points_earned == 0 and self.weight < 0) else "red"
+        if verbose:
+            self.feedback_message.replace("\n", "\n\t\t")
+            console.print(f"Rubric Category: {self.name}")
+            console.print(f"\tDescription: {self.description}")
+            console.print(f"\tPoints: {self.points_earned} / {self.weight}", style=points_style)
+            console.print(f"\tFeedback:\n\t\t{self.feedback_message.replace("\n", "\n\t\t")}")
+        else:
+            console.print(f"{self.name}: {self.points_earned} / {self.weight} pts")
+
 
     @staticmethod
     def create() -> RubricCategory:

@@ -52,8 +52,16 @@ def lesson01(
 
 @app.command(help="Grade lesson 02 deliverable(s).")
 def lesson02(
-    files: List[str] = typer.Argument([], autocompletion=file_autocompletion)
-):
+    files: List[str] = typer.Argument(
+        [], autocompletion=file_autocompletion,
+        help="Files to be graded."
+        ), 
+        verbose: bool = typer.Option(
+            False,
+            "--verbose",
+            "-v",
+            help="Shows the rubric criteria in addition to point values.",
+    )):
     random_number_v2_file_name = "random_number_v2.py"
     rock_paper_scissors_v1_file_name = "rock_paper_scissors_v1.py"
 
@@ -94,4 +102,4 @@ def lesson02(
         random_number_v2_rubric_feedback, rock_paper_scissors_v1_rubric_feedback
     ])
 
-    assignment_feedback.console_print(console)    
+    assignment_feedback.console_print(console, verbose)    

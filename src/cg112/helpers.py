@@ -148,7 +148,6 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
         if not re_match:
             return False
 
-        print(re_match.groups())
         placeholder_var_dict: dict[str, str] = {}
         for i, group in enumerate(re_match.groups()):
             var = group.split(":")[0].strip()
