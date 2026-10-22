@@ -4,12 +4,12 @@ from cg112.feedback import RubricCategory, MessageBuilder
 from cg112.helpers import *
 
 def grade_random_number_v2(deliverable: Path) -> List[RubricCategory]:
-    feedback_categories: List[RubricCategory] = []
+    rubric_categories: List[RubricCategory] = []
 
-    feedback_categories.append(check_secret_hex(
+    rubric_categories.append(check_secret_hex(
         deliverable, "0xC0FFEE11"
     ))
-    feedback_categories.append(
+    rubric_categories.append(
         script_runs_without_error(deliverable, 3.0)
     )
 
@@ -30,7 +30,7 @@ def grade_random_number_v2(deliverable: Path) -> List[RubricCategory]:
     else:
         feedback_message.append("[red]No loop for limiting user guesses was found.")
 
-    feedback_categories.append(RubricCategory(
+    rubric_categories.append(RubricCategory(
         "Limit User Guesses", 4.0, 2*float(prompt_user) + 2*float(uses_for_loop),
         "Checks if the script properly limits user guesses through prompting and looping.",
         feedback_message.build()
@@ -60,7 +60,7 @@ def grade_random_number_v2(deliverable: Path) -> List[RubricCategory]:
     else:
         feedback_message.append("[red]Did not find prompt for replay.")
 
-    feedback_categories.append(RubricCategory(
+    rubric_categories.append(RubricCategory(
         "User Can Play Again", 4.0, 2*float(replay_while_loop) + 2*float(replay_prompt),
         "Checks if the script properly allows the user to replay the game.",
         feedback_message.build()
@@ -94,9 +94,9 @@ deliverable)
     else:
         feedback_message.append("[red]Total guesses are not properly tracked or displayed.")
 
-    feedback_categories.append(RubricCategory(
+    rubric_categories.append(RubricCategory(
         "Guess Checking and Tracking", 4.0, 2*float(high_low_messages) + 2*float(guess_tracking),
         "Checks if guesses are properly checked, tracked, and displayed.",
         feedback_message.build()
     ))
-    return feedback_categories
+    return rubric_categories
