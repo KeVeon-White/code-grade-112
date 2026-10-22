@@ -107,7 +107,7 @@ def lesson02(files: List[str] = generic_files_argument, verbose: bool = generic_
 @app.command(help="Grade lesson 03 deliverable(s).")
 def lesson03(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
     random_number_v3_file_name: str = "random_number_v3.py"
-    rock_paper_scissors_v2_file_name: str = "rock_paper_scissors_v3.py"
+    rock_paper_scissors_v2_file_name: str = "rock_paper_scissors_v2.py"
 
     found_files: Dict[str, Optional[Path]] = get_files(files, [random_number_v3_file_name, rock_paper_scissors_v2_file_name])
 
