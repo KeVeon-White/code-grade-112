@@ -97,7 +97,10 @@ Feedback:
 
     def console_print(self, console: Console, verbose: bool = True):
         points_style = "green" if (self.points_earned == self.weight) or \
-            (self.points_earned == 0 and self.weight < 0) else "red"
+            (self.points_earned == 0 and self.weight < 0) else \
+                "yellow" if self.points_earned == 0 else "red"
+        emoji  = u"\u2705" if points_style == "green" else \
+            u"\u26A0" if points_style == "yellow" else u"\u274C"
         if verbose:
             self.feedback_message.replace("\n", "\n\t\t")
             console.print(f"Rubric Category: {self.name}")
@@ -105,7 +108,7 @@ Feedback:
             console.print(f"\tPoints: {self.points_earned} / {self.weight}", style=points_style)
             console.print(f"\tFeedback:\n\t\t{self.feedback_message.replace("\n", "\n\t\t")}")
         else:
-            console.print(f"{self.name}: {self.points_earned} / {self.weight} pts")
+            console.print(f"{emoji} {self.name}: {self.points_earned} / {self.weight} pts")
 
 
     @staticmethod
