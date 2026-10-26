@@ -13,106 +13,73 @@ def grade_rock_paper_scissors_v2(deliverable: Path) -> List[RubricCategory]:
         script_runs_without_error(deliverable, 10.0)
     )
 
+    #region comparison()
+    comparison_signature: bool = generic_semgrep(r"def comparison\($USER, $CPU\)", deliverable)
+    stat_tracking: bool = (generic_semgrep(r"global $WINS, $LOSES, $TIES", deliverable) or generic_semgrep(
+r"""
+\s*global $WINS
+\s*global $LOSES
+\s*global $TIES
+""", deliverable))
+    
+    feedback_message: MessageBuilder = MessageBuilder()
+    if comparison_signature:
+       feedback_message.append("[green][i]comparison()[/i] has the proper function signature.")
+    else:
+      feedback_message.append("[red][i]comparison()[/i] does not have the proper function signature.")
+
+    if stat_tracking:
+      feedback_message.append("[green]Stat tracking is properly handled within [i]comparison()[/i]")
+    else:
+       feedback_message.append("[red]Stat tracking is either not properly handled OR not handled within [i]comparison()[/i].")
+
+    rubric_categories.append(RubricCategory(
+        "[i]comparison()[/i]", 7.0, 3.5*comparison_signature + 3.5*stat_tracking,
+        "Checks for correct function signature of [i]comparison()[/i] and that stat tracking happens within that function.",
+        feedback_message.build()
+    ))
+    #endregion
+    
+    #region display_stats()
+    display_stats: bool = (
+       generic_re(r"def display_stats\(\):", deliverable)
+    ) and (
+       (
+        generic_semgrep(r"print\((?:.|\s)*$WINS(?:.|\s)*\)", deliverable) and \
+        generic_semgrep(r"print\((?:.|\s)*$LOSES(?:.|\s)*\)", deliverable) and \
+        generic_semgrep(r"print\((?:.|\s)*$TIES(?:.|\s)*\)", deliverable)
+    ) or (
+       generic_semgrep(r"print\((?:.|\s)*$WINS(?:.|\s)*$LOSES(?:.|\s)*$TIES\)", deliverable)
+    ))
+
+    feedback_message.clear()
+    if display_stats:
+       feedback_message.append("[green]Player stats are properly displayed by [i]display_stats()[/i].")
+    else:
+       feedback_message.append("[red]Player stats EITHER are not properly displayed with [i]print()[/i] OR it does not happen within [i]display_stats()[/i]")
+
+    rubric_categories.append(RubricCategory(
+       "[i]display_stats()[/i]", 3.0, 3.0*display_stats,
+       "Checks if [i]display_stats[/i] exists and that player stats are displayed with that function.",
+       feedback_message.build()
+    ))
+    #endregion
+
+    #region is_valid_choice()
+    is_valid_choice_signature: bool = generic_semgrep(
+       r"def is_valid_choice\($CHOICE\)", deliverable)
+
+    feedback_message.clear()
+    if is_valid_choice_signature:
+       feedback_message.append("[green][i]is_valid_choice()[/i] has been updated validly.")
+    else:
+       feedback_message.append("[red][i]is_valid_choice()[/i] has NOT been updated validly.")
+
+    rubric_categories.append(RubricCategory(
+       "[i]is_valid_choice()[/i]", 5.0, 5.0*is_valid_choice_signature,
+       "Checks if [i]is_valid_choice()[/i] has been updated with the proper signature.",
+       feedback_message.build()
+    ))
+    #endregion
+
     return rubric_categories
-
-"""7 points: [i]comparison()[/i]
-# Use the semgrep playground to create a rule, then copy the result you find
-# in the `advanced` tab into this block. https://semgrep.dev/editor
-rules:
-  - id: comparison_function_signature
-    pattern-either:
-      - pattern: |
-          def comparison($USER: str, $CPU: str) -> int: 
-            ...
-      - pattern: |
-          def comparison($USER, $CPU): 
-            ...
-    message: Semgrep found a match
-    languages: [python]
-    severity: WARNING
-
-# Use the semgrep playground to create a rule, then copy the result you find
-# in the `advanced` tab into this block. https://semgrep.dev/editor
-rules:
-  - id: stat_tracking
-    patterns:
-      - pattern-either: 
-        - pattern: |
-            def comparison(...):
-              ...
-              global $WINS, $LOSES, $TIES
-        - pattern: |
-            def comparison(...):
-              ...
-              global $WINS
-              global $LOSES
-              global $TIES
-      - pattern-either:
-        - pattern: |
-            def comparison(...):
-              ...
-              $TIES += 1
-        - pattern: |
-            def comparison(...):
-              ...
-              $TIES = $TIES + 1
-      - pattern-either:
-        - pattern: |
-            def comparison(...):
-              ...
-              $WINS += 1
-        - pattern: |
-            def comparison(...):
-              ...
-              $WINS = $WINS + 1
-      - pattern-either:
-        - pattern: |
-            def comparison(...):
-              ...
-              $LOSES += 1
-        - pattern: |
-            def comparison(...):
-              ...
-              $LOSES = $LOSES + 1
-    message: Semgrep found a match
-    languages: [python]
-    severity: WARNING
-"""
-
-"""3 points: [i]display_stats()[/i]
-# Use the semgrep playground to create a rule, then copy the result you find
-# in the `advanced` tab into this block. https://semgrep.dev/editor
-rules:
-  - id: display_stats
-    pattern-either:
-      - pattern: |
-          def display_stats():
-            ...
-            print(...,$WINS,...)
-            print(...,$LOSES,...)
-            print(...,$TIES,...)
-      - pattern: |
-          def display_stats():
-            ...
-            print(...,$WINS,...,$LOSES,...,$TIES,...)
-    message: Semgrep found a match
-    languages: [python]
-    severity: WARNING
-"""
-
-"""5 points: [i]is_valid_choice()[/i]
-# Use the semgrep playground to create a rule, then copy the result you find
-# in the `advanced` tab into this block. https://semgrep.dev/editor
-rules:
-  - id: is_valid_choice_signature
-    pattern-either:
-      - pattern: |
-          def is_valid_choice($CHOICE: str) -> bool:
-            ...
-      - pattern: |
-          def is_valid_choice($CHOICE):
-            ...
-    message: Semgrep found a match
-    languages: [python]
-    severity: WARNING
-"""

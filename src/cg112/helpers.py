@@ -5,7 +5,10 @@ import re, subprocess
 from cg112.feedback import RubricCategory
 from cg112.styling import *
 
-ID_NAME_RAW_PATTERN: str = r"[_a-zA-Z]\w*:?? ??\w*?"
+ID_NAME_RAW_PATTERN: str = r"[_a-zA-Z][0-9a-zA-Z_]*:? ?\w*"
+#r"[_a-zA-Z]\w*:?? ??\w*?"
+
+file_cache: Dict[Path, str] = {}
 
 def get_subprocess_output(arg: str) -> Optional[str]:
     proc: subprocess.Popen[bytes] = subprocess.Popen(arg, stdout=subprocess.PIPE, shell=True)
@@ -114,9 +117,12 @@ def generic_re(pattern: str, file_path: Union[str, Path]) -> bool:
         return False
     re_pattern: re.Pattern = re.compile(pattern)
 
-    file_contents: str = ""
-    with open(fp) as fh:
-        file_contents = fh.read()
+    file_contents: str = file_cache.get(fp, "")
+
+    if file_contents == "":
+        with open(fp) as fh:
+            file_contents = fh.read()
+        file_cache[fp] = file_contents
     re_match: Optional[re.Match] = re_pattern.search(file_contents)
 
     return re_match is not None
@@ -135,16 +141,16 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
         map(
             lambda tos : tos[0] if isinstance(tos, tuple) else tos,
             filter(lambda g : "$" in  g[0], re.findall(fr"(\${ID_NAME_RAW_PATTERN})", pattern))))
-
+    
     new_pattern = pattern
     if len(placeholders) > 0:
         for ph in set(placeholders):
             new_pattern = new_pattern.replace(ph, f"({ID_NAME_RAW_PATTERN})")
 
         re_pattern: re.Pattern = re.compile(new_pattern)
-
+        
         re_match: Optional[re.Match] = re_pattern.search(file_contents)
-
+        
         if not re_match:
             return False
 
@@ -180,3 +186,4 @@ def get_files(files: List[str], names: List[str]) -> Dict[str, Optional[Path]]:
         if not file_found:
             print_warning(f"File not recognized (skipping): {file}")
     return ret
+

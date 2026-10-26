@@ -15,6 +15,9 @@ from cg112.graders.lesson02.rock_paper_scissors_v1 import grade_rock_paper_sciss
 from cg112.graders.lesson03.random_number_v3 import grade_random_number_v3
 from cg112.graders.lesson03.rock_paper_scissors_v2 import grade_rock_paper_scissors_v2
 
+from cg112.graders.lesson04.computer_specs_v2 import grade_computer_specs_v2
+from cg112.graders.lesson04.inventory_management_v1 import grade_inventory_management_v1
+
 app = typer.Typer()
 console = Console()
 base_dir = Path(__file__).parent.parent.parent.resolve()
@@ -146,4 +149,50 @@ def lesson03(files: List[str] = generic_files_argument, verbose: bool = generic_
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
         random_number_v3_rubric_feedback, rock_paper_scissors_v2_rubric_feedback])
     
+    assignment_feedback.console_print(console, verbose)
+
+@app.command(help="Grade lesson 04 deliverable(s).")
+def lesson04(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    computer_specs_v2_file_name: str = "computer_specs_v2.py"
+    inventory_management_v1_file_name: str = "inventory_management_v1.py"
+
+    found_files: Dict[str, Optional[Path]] = get_files(
+        files, [computer_specs_v2_file_name, inventory_management_v1_file_name]
+    )
+
+    computer_specs_v2: Optional[Path] = found_files.get(computer_specs_v2_file_name)
+    inventory_management_v1: Optional[Path] = found_files.get(inventory_management_v1_file_name)
+
+    computer_specs_v2_rubric_categories: List[RubricCategory] = []
+    inventory_management_v1_rubric_categories: List[RubricCategory] = []
+
+    #region Computer Specs version 2
+    if not computer_specs_v2:
+        print_err(f"No file found for {computer_specs_v2_file_name}")
+    else:
+        computer_specs_v2_rubric_categories = grade_computer_specs_v2(computer_specs_v2)
+
+    computer_specs_v2_rubric_feedback: RubricFeedback = RubricFeedback(
+        "Computer Specifications v2",
+        computer_specs_v2,
+        computer_specs_v2_rubric_categories
+    )
+    #endregion
+
+    #region Inventory Management version 1
+    if not inventory_management_v1:
+        print_err(f"No file found for {inventory_management_v1_file_name}")
+    else:
+        inventory_management_v1_rubric_categories = grade_inventory_management_v1(inventory_management_v1)
+
+    inventory_management_v1_rubric_feedback: RubricFeedback = RubricFeedback(
+        "Inventory Management v1",
+        inventory_management_v1,
+        inventory_management_v1_rubric_categories
+    )
+    #endregion
+
+    assignment_feedback: AssignmentFeedback = AssignmentFeedback([
+        computer_specs_v2_rubric_feedback, inventory_management_v1_rubric_feedback])
+
     assignment_feedback.console_print(console, verbose)
