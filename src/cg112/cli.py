@@ -18,6 +18,8 @@ from cg112.graders.lesson03.rock_paper_scissors_v2 import grade_rock_paper_sciss
 from cg112.graders.lesson04.computer_specs_v2 import grade_computer_specs_v2
 from cg112.graders.lesson04.inventory_management_v1 import grade_inventory_management_v1
 
+from cg112.graders.lesson05.string_reversal import grade_string_reversal
+
 app = typer.Typer()
 console = Console()
 base_dir = Path(__file__).parent.parent.parent.resolve()
@@ -194,5 +196,35 @@ def lesson04(files: List[str] = generic_files_argument, verbose: bool = generic_
 
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
         computer_specs_v2_rubric_feedback, inventory_management_v1_rubric_feedback])
+
+    assignment_feedback.console_print(console, verbose)
+
+@app.command(help="Grade lesson 04 deliverable(s).")
+def lesson05(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    string_reversal_file_name: str = "string_reversal.py"
+
+    found_files: Dict[str, Optional[Path]] = get_files(
+        files, [string_reversal_file_name]
+    )
+
+    string_reversal: Optional[Path] = found_files.get(string_reversal_file_name)
+
+    string_reversal_rubric_categories: List[RubricCategory] = []
+
+    #region String Reversal
+    if not string_reversal:
+        print_err(f"No file found for {string_reversal_file_name}")
+    else:
+        string_reversal_rubric_categories = grade_string_reversal(string_reversal)
+
+    string_reversal_rubric_feedback: RubricFeedback = RubricFeedback(
+        "Computer Specifications v2",
+        string_reversal,
+        string_reversal_rubric_categories
+    )
+    #endregion
+
+    assignment_feedback: AssignmentFeedback = AssignmentFeedback([
+        string_reversal_rubric_feedback])
 
     assignment_feedback.console_print(console, verbose)
