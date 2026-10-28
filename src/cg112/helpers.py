@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from pathlib import Path
 import re, subprocess
 
@@ -24,7 +24,7 @@ def str_to_path(file_path: str) -> Path:
 def resolve_file(file_path: Union[str, Path]) -> Path:
     fp: Path
     if isinstance(file_path, str):
-        fp = str_to_path(file_path)
+        fp = str_to_path(file_path).resolve()
     else:
         fp = file_path.resolve()
 
@@ -173,9 +173,67 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
             else:
                 placeholder_var_dict[placeholder] = var
 
-    
-
     return True
+
+def generic_io_test(file_path: Union[str, Path], cmds: List[str], inputs: List[str], outputs: List[str]) -> List[Tuple[bool, str, str]]:
+    """
+    Returns matches of IO from commands.
+
+    Parameters
+    ----------
+    file_path : Union[str, Path]
+        The file path (as a str or Path object) to run IO tests on.
+
+    cmds : List[str]
+        The commands to run in which to test IO on.
+
+    inputs : List[str]
+        The inputs to run on every iteration of commands.
+
+    outputs : List[str]
+        The expected output from each command run.
+
+    Returns
+    -------
+    : List[Tuple[bool, str, str]]
+        A list of tuples corresponding to each run command where the 3-tuple is (success, expected, actual)
+    """
+    if len(cmds) != len(outputs):
+        print_err("The length of commands must be the same as the length of outputs.")
+        return []
+
+    fp, file_contents = get_file_and_contents(file_path)
+    if not file_contents:
+        return []
+
+    ret: List[Tuple[bool, str, str]] = []
+    tmp_file: Path = Path(__file__).parent / 'tmp.py'
+    input_file: Path = Path(__file__).parent / "inputs.txt"
+
+    with open(tmp_file, "w") as writer:
+        writer.write(file_contents)
+    with open(input_file, "w") as writer:
+        writer.write("\n".join(inputs))
+
+    for i, cmd in enumerate(cmds):
+        expected: str = outputs[i]
+        actual: Optional[str] = get_subprocess_output(f"python3 -c \"from cg112.tmp import *; {cmd}\" << {input_file}")
+
+        if actual and actual.endswith("\n"):
+            actual = actual[:-1]
+        
+        ret.append(
+            (expected == actual, expected, actual or "")
+        )
+
+    tmp_file.unlink(True)
+    input_file.unlink(True)
+
+    return ret
+
+def score_io_test(test: List[Tuple[bool, str, str]], weight: float) -> float:
+    weight_per: float = weight / len(test)
+    return weight_per * len(list(filter(lambda item : item[0], test)))
 
 def get_files(files: List[str], names: List[str]) -> Dict[str, Optional[Path]]:
     ret: Dict[str, Optional[Path]] = {}
@@ -192,4 +250,18 @@ def get_files(files: List[str], names: List[str]) -> Dict[str, Optional[Path]]:
         if not file_found:
             print_warning(f"File not recognized (skipping): {file}")
     return ret
+
+def get_file_and_contents(file_path: Union[str, Path]) -> Tuple[Path, Optional[str]]:
+    fp = resolve_file(file_path)
+    if not fp.exists():
+        print("[yellow]File not found")
+        return (fp, None)
+    
+    file_contents: str = file_cache.get(fp, "")
+    if file_contents == "":
+        with open(fp) as fh:
+            file_contents = fh.read()
+        file_cache[fp] = file_contents
+
+    return (fp, file_contents)
 

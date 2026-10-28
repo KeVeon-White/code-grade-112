@@ -199,9 +199,9 @@ def lesson04(files: List[str] = generic_files_argument, verbose: bool = generic_
 
     assignment_feedback.console_print(console, verbose)
 
-@app.command(help="Grade lesson 04 deliverable(s).")
+@app.command(help="Grade lesson 05 deliverable(s).")
 def lesson05(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    string_reversal_file_name: str = "string_reversal.py"
+    string_reversal_file_name: str = "string_reversals.py"
 
     found_files: Dict[str, Optional[Path]] = get_files(
         files, [string_reversal_file_name]
