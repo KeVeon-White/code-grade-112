@@ -98,7 +98,7 @@ Feedback:
     def console_print(self, console: Console, verbose: bool = True):
         points_style = "green" if (self.points_earned == self.weight) or \
             (self.points_earned == 0 and self.weight < 0) else \
-                "yellow" if self.points_earned == 0 else "red"
+                "yellow" if self.points_earned > 0 else "red"
         emoji  = u"\u2705" if points_style == "green" else \
             u"\u26A0" if points_style == "yellow" else u"\u274C"
         if verbose:

@@ -133,9 +133,12 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
     if not fp.exists():
         print("[yellow]File not found")
         return False
-    file_contents: str = ""
-    with open(fp) as fh:
-        file_contents = fh.read()
+    
+    file_contents: str = file_cache.get(fp, "")
+    if file_contents == "":
+        with open(fp) as fh:
+            file_contents = fh.read()
+        file_cache[fp] = file_contents
     
     placeholders = list(
         map(
@@ -145,7 +148,8 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
     new_pattern = pattern
 
     if "..." in new_pattern:
-        new_pattern.replace("...", r"(?:.|\s)*")
+        new_pattern = new_pattern.replace("...", r"(?:.|\s)*")
+        print(new_pattern)
 
     if len(placeholders) > 0:
         for ph in set(placeholders):
