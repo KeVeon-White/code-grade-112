@@ -149,7 +149,6 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
 
     if "..." in new_pattern:
         new_pattern = new_pattern.replace("...", r"(?:.|\s)*")
-        print(new_pattern)
 
     if len(placeholders) > 0:
         for ph in set(placeholders):
