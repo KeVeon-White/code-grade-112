@@ -9,17 +9,6 @@ from cg112.helpers import *
 from cg112.feedback import AssignmentFeedback, RubricFeedback, RubricCategory
 from cg112.styling import err_style, warn_style, print_err, print_warning
 
-from cg112.graders.lesson02.random_number_v2 import grade_random_number_v2
-from cg112.graders.lesson02.rock_paper_scissors_v1 import grade_rock_paper_scissors_v1
-
-from cg112.graders.lesson03.random_number_v3 import grade_random_number_v3
-from cg112.graders.lesson03.rock_paper_scissors_v2 import grade_rock_paper_scissors_v2
-
-from cg112.graders.lesson04.computer_specs_v2 import grade_computer_specs_v2
-from cg112.graders.lesson04.inventory_management_v1 import grade_inventory_management_v1
-
-from cg112.graders.lesson05.string_reversal import grade_string_reversal
-
 app = typer.Typer()
 console = Console()
 base_dir = Path(__file__).parent.parent.parent.resolve()
@@ -67,164 +56,54 @@ def lesson01(files: List[str] = generic_files_argument, verbose: bool = generic_
 
 @app.command(help="Grade lesson 02 deliverable(s).")
 def lesson02(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    random_number_v2_file_name: str = "random_number_v2.py"
-    rock_paper_scissors_v1_file_name: str = "rock_paper_scissors_v1.py"
-
-    found_files: Dict[str, Optional[Path]] = get_files(files, [random_number_v2_file_name, rock_paper_scissors_v1_file_name])
-
-    random_number_v2: Optional[Path] = found_files.get(random_number_v2_file_name)
-    rock_paper_scissors_v1: Optional[Path] = found_files.get(rock_paper_scissors_v1_file_name)
-
-    random_number_v2_rubric_categories: List[RubricCategory] = []
-    rock_paper_scissors_v1_rubric_categories: List[RubricCategory] = []
-
-    #region Random Number version 2
-    if not random_number_v2:
-        print_err(f"No file found for {random_number_v2_file_name}")
-    else:
-        random_number_v2_rubric_categories = grade_random_number_v2(random_number_v2)
-
-    random_number_v2_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Random Number v2", 
-        random_number_v2,
-        random_number_v2_rubric_categories)
-    #endregion
-
-    #region Rock Paper Scissors version 1
-    if not rock_paper_scissors_v1:
-        print_err(f"No file found for {rock_paper_scissors_v1_file_name}")
-    else:
-        rock_paper_scissors_v1_rubric_categories = grade_rock_paper_scissors_v1(rock_paper_scissors_v1)
-
-    rock_paper_scissors_v1_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Rock, Paper, Scissors v1",
-        rock_paper_scissors_v1,
-        rock_paper_scissors_v1_rubric_categories
-    )
-    #endregion
+    from cg112.graders.random_number_v2 import RandomNumberV2Grader
+    from cg112.graders.rock_paper_scissors_v1 import RockPaperScissorsV1Grader
 
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
-        random_number_v2_rubric_feedback, rock_paper_scissors_v1_rubric_feedback
+        RandomNumberV2Grader(files).rubric_feedback, 
+        RockPaperScissorsV1Grader(files).rubric_feedback
     ])
 
     assignment_feedback.console_print(console, verbose)    
 
 @app.command(help="Grade lesson 03 deliverable(s).")
 def lesson03(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    random_number_v3_file_name: str = "random_number_v3.py"
-    rock_paper_scissors_v2_file_name: str = "rock_paper_scissors_v2.py"
-
-    found_files: Dict[str, Optional[Path]] = get_files(files, [random_number_v3_file_name, rock_paper_scissors_v2_file_name])
-
-    random_number_v3: Optional[Path] = found_files.get(random_number_v3_file_name)
-    rock_paper_scissors_v2: Optional[Path] = found_files.get(rock_paper_scissors_v2_file_name)
-
-    random_number_v3_rubric_categories: List[RubricCategory] = []
-    rock_paper_scissors_v2_rubric_categories: List[RubricCategory] = []
-
-    #region Random Number version 3
-    if not random_number_v3:
-        print_err(f"No file found for {random_number_v3_file_name}")
-    else:
-        random_number_v3_rubric_categories = grade_random_number_v3(random_number_v3)
-
-    random_number_v3_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Random Number v3",
-        random_number_v3,
-        random_number_v3_rubric_categories
-    )
-    #endregion
-
-    #region Rock Paper Scissors version 2
-    if not rock_paper_scissors_v2:
-        print_err(f"No file found for {rock_paper_scissors_v2_file_name}")
-    else:
-        rock_paper_scissors_v2_rubric_categories = grade_rock_paper_scissors_v2(rock_paper_scissors_v2)
-
-    rock_paper_scissors_v2_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Rock, Paper, Scissors v2",
-        rock_paper_scissors_v2,
-        rock_paper_scissors_v2_rubric_categories
-    )
-    #endregion
-
+    from cg112.graders.random_number_v3 import RandomNumberV3Grader
+    from cg112.graders.rock_paper_scissors_v2 import RockPaperScissorsV2Grader
+    
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
-        random_number_v3_rubric_feedback, rock_paper_scissors_v2_rubric_feedback])
+        RandomNumberV3Grader(files).rubric_feedback,
+        RockPaperScissorsV2Grader(files).rubric_feedback])
     
     assignment_feedback.console_print(console, verbose)
 
 @app.command(help="Grade lesson 04 deliverable(s).")
 def lesson04(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    computer_specs_v2_file_name: str = "computer_specs_v2.py"
-    inventory_management_v1_file_name: str = "inventory_management_v1.py"
-
-    found_files: Dict[str, Optional[Path]] = get_files(
-        files, [computer_specs_v2_file_name, inventory_management_v1_file_name]
-    )
-
-    computer_specs_v2: Optional[Path] = found_files.get(computer_specs_v2_file_name)
-    inventory_management_v1: Optional[Path] = found_files.get(inventory_management_v1_file_name)
-
-    computer_specs_v2_rubric_categories: List[RubricCategory] = []
-    inventory_management_v1_rubric_categories: List[RubricCategory] = []
-
-    #region Computer Specs version 2
-    if not computer_specs_v2:
-        print_err(f"No file found for {computer_specs_v2_file_name}")
-    else:
-        computer_specs_v2_rubric_categories = grade_computer_specs_v2(computer_specs_v2)
-
-    computer_specs_v2_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Computer Specifications v2",
-        computer_specs_v2,
-        computer_specs_v2_rubric_categories
-    )
-    #endregion
-
-    #region Inventory Management version 1
-    if not inventory_management_v1:
-        print_err(f"No file found for {inventory_management_v1_file_name}")
-    else:
-        inventory_management_v1_rubric_categories = grade_inventory_management_v1(inventory_management_v1)
-
-    inventory_management_v1_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Inventory Management v1",
-        inventory_management_v1,
-        inventory_management_v1_rubric_categories
-    )
-    #endregion
+    from cg112.graders.computer_specs_v2 import ComputerSpecsV2Grader
+    from cg112.graders.inventory_management_v1 import InventoryManagementV1Grader
 
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
-        computer_specs_v2_rubric_feedback, inventory_management_v1_rubric_feedback])
+        ComputerSpecsV2Grader(files).rubric_feedback, 
+        InventoryManagementV1Grader(files).rubric_feedback])
 
     assignment_feedback.console_print(console, verbose)
 
 @app.command(help="Grade lesson 05 deliverable(s).")
 def lesson05(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    string_reversal_file_name: str = "string_reversals.py"
-
-    found_files: Dict[str, Optional[Path]] = get_files(
-        files, [string_reversal_file_name]
-    )
-
-    string_reversal: Optional[Path] = found_files.get(string_reversal_file_name)
-
-    string_reversal_rubric_categories: List[RubricCategory] = []
-
-    #region String Reversal
-    if not string_reversal:
-        print_err(f"No file found for {string_reversal_file_name}")
-    else:
-        string_reversal_rubric_categories = grade_string_reversal(string_reversal)
-
-    string_reversal_rubric_feedback: RubricFeedback = RubricFeedback(
-        "Computer Specifications v2",
-        string_reversal,
-        string_reversal_rubric_categories
-    )
-    #endregion
+    from cg112.graders.string_reversal import StringReversalGrader
 
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
-        string_reversal_rubric_feedback])
+        StringReversalGrader(files).rubric_feedback])
+
+    assignment_feedback.console_print(console, verbose)
+
+@app.command(help="Grade lesson 06 deliverable(s).")
+def lesson06(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    from cg112.graders.multiplication_quiz_v1 import MultiplicationQuizV1Grader
+    from cg112.graders.sub_maker_v1 import SubMakerV1Grader
+
+    assignment_feedback: AssignmentFeedback = AssignmentFeedback([
+        MultiplicationQuizV1Grader(files).rubric_feedback, 
+        SubMakerV1Grader(files).rubric_feedback])
 
     assignment_feedback.console_print(console, verbose)
