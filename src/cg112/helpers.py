@@ -143,6 +143,10 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
             filter(lambda g : "$" in  g[0], re.findall(fr"(\${ID_NAME_RAW_PATTERN})", pattern))))
     
     new_pattern = pattern
+
+    if "..." in new_pattern:
+        new_pattern.replace("...", r"(?:.|\s)*")
+
     if len(placeholders) > 0:
         for ph in set(placeholders):
             new_pattern = new_pattern.replace(ph, f"({ID_NAME_RAW_PATTERN})")
@@ -166,8 +170,7 @@ def generic_semgrep(pattern: str, file_path: Union[str, Path]) -> bool:
             else:
                 placeholder_var_dict[placeholder] = var
 
-    if "..." in new_pattern:
-        pass
+    
 
     return True
 
