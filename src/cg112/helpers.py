@@ -264,4 +264,3 @@ def get_file_and_contents(file_path: Union[str, Path]) -> Tuple[Path, Optional[s
         file_cache[fp] = file_contents
 
     return (fp, file_contents)
-
