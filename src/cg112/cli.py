@@ -107,3 +107,9 @@ def lesson06(files: List[str] = generic_files_argument, verbose: bool = generic_
         SubMakerV1Grader(files).rubric_feedback])
 
     assignment_feedback.console_print(console, verbose)
+
+@app.command(help="Grade lesson 01 deliverable(s).")
+def lesson07(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    console = Console()
+    console.rule("Lesson 07 Submission Grading")
+    console.print("No submission to grade.", style="red underline", justify="center")
