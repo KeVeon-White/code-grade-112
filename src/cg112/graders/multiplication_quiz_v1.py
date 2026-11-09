@@ -16,86 +16,78 @@ class MultiplicationQuizV1Grader(Grader):
         )
 
     def grade(self):
-        pass
+        #region Use of PyInputPlus
+        imported: bool = generic_grep(
+            "import pyinputplus", self.assignment_file)
+        no_input: bool = not generic_grep(
+            "input(", self.assignment_file)
+        input_int: bool = generic_grep(
+            ".inputInt(", self.assignment_file)
 
-#region Use of PyInputPlus: 5 points
-""" import
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
+        feedback_message: MessageBuilder = MessageBuilder()
+        if imported:
+            feedback_message.append("[green]PyInputPlus is properly imported.")
+        else:
+            feedback_message.append("[red]PyInputPlus is not properly imported or missing. Ensure [code]import pyinputplus[/code] is included.")
 
-if ( grep -q -i "import pyinputplus" multiplication_quiz_v1.py ); then
-    echo "Found Import Statement"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-else
-    echo "Did Not Find Import Statement"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-fi
-"""
+        if no_input:
+            feedback_message.append("[green][i]input()[/i] was not used.")
+        else:
+            feedback_message.append("[red][i]input()[/i] WAS used. Try using [code]pyinputplus[/code] instead.")
 
-""" no use of input
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
+        if input_int:
+            feedback_message.append("[green][i]pyinputplus.inputInt()[/i] was used.")
+        else:
+            feedback_message.append("[red][i]pyinputplus.inputInt()[/i] was NOT used.")
 
-if ( grep -q -i "input(" multiplication_quiz_v1.py ); then
-    echo "Found input()"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-else
-    echo "Did Not Find input()"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-fi
-"""
+        self.rubric_categories.append(RubricCategory(
+            "Use of PyInputPlus", 5.0, (5/3)*imported + (5/3)*no_input + (5/3)*input_int,
+            "Checks if PyInputPlus was used correctly and instead of standard input.",
+            feedback_message.build()
+        ))
+        #endregion
 
-""" use of .inputInt
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
+        #region Limitation of Attempts and Time Constraint
+        limits_attempts: bool = generic_grep(
+            "limit=", self.assignment_file) or generic_grep(
+                "limit =", self.assignment_file)
+        limits_time: bool = generic_grep(
+            "timeout=", self.assignment_file) or generic_grep(
+                "timeout =", self.assignment_file)
 
-if ( grep -q -i ".inputInt" multiplication_quiz_v1.py ); then
-    echo "Found pyinputplus.inputMenu()"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-else
-    echo "Did Not Find pyinputplus.inputMenu()"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-fi
-"""
-#endregion
+        feedback_message.clear()
+        if limits_attempts:
+            feedback_message.append("[green]Attempts are limited for each question.")
+        else:
+            feedback_message.append("[red]Attempts are NOT limited for questions. Try using the [i]limit[/i] named argument.")
 
-#region Limitations of Attempts and Time: 5 points
-""" limit of attempts
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
+        if limits_time:
+            feedback_message.append("[green]Time is limited for each question.")
+        else:
+            feedback_message.append("[red]Time is NOT limited for questions. Try using the [i]timeout[/i] named argument.")
+        
+        self.rubric_categories.append(RubricCategory(
+            "Limitations on Attempts and Time", 5.0, 2.5*limits_attempts + 2.5*limits_time,
+            "Checks if number of attempts and length of time are limited for each question in the quiz.",
+            feedback_message.build()
+        ))
+        #endregion
 
-if ( grep -q -i "limit=" multiplication_quiz_v1.py ); then
-    echo "Found user input limitation"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-else
-    echo "Did not find user input limitation"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-fi
-"""
+        #region Timer
+        timer: bool = generic_grep(
+            "import time", self.assignment_file) and (generic_semgrep(
+                "$START - $END", self.assignment_file) or generic_semgrep(
+                    "- $START", self.assignment_file))
 
-""" limit of time
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
+        feedback_message.clear()
+        if timer:
+            feedback_message.append("[green]Time is kept for the quiz.")
+        else:
+            feedback_message.append("[red]Time is NOT kept for the quiz. Try [code]starttime - endtime[/code].")
 
-if ( grep -q -i "timeout=" multiplication_quiz_v1.py ); then
-    echo "Found user time limitation"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-else
-    echo "Did not find user time limitation"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-fi
-"""
-#endregion
-
-""" Timer: 5 points
-# Write your bash script here, output the score in a JSON object to structured output (file descriptor 3).
-# For example: echo '{ "tag": "points", "points": "1/3" }' >&3
-
-if ( grep -q -i "import time" multiplication_quiz_v1.py ); then
-    echo "Found time"
-    echo '{ "tag": "points", "points": "1/1" }' >&3
-else
-    echo "Did Not Find time"
-    echo '{ "tag": "points", "points": "0/1" }' >&3
-fi
-"""
+        self.rubric_categories.append(RubricCategory(
+            "Timer", 5.0, 5.0*timer,
+            "Checks if time is kept from the start of the quiz 'til the end of the quiz.",
+            feedback_message.build()
+        ))
+        #endregion

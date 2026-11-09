@@ -13,6 +13,10 @@ app = typer.Typer()
 console = Console()
 base_dir = Path(__file__).parent.parent.parent.resolve()
 
+def no_submission(lesson_number: int):
+    console.rule(f"Lesson {lesson_number:02} Submission Grading")
+    console.print("No submission to grade.", style="red underline", justify="center")
+
 def file_autocompletion(incomplete: str) -> List[str]:
     dir: Path = Path(incomplete).resolve()
     while not dir.exists() or not dir.is_dir():
@@ -50,9 +54,7 @@ def main(
 
 @app.command(help="Grade lesson 01 deliverable(s).")
 def lesson01(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    console = Console()
-    console.rule("Lesson 01 Submission Grading")
-    console.print("No submission to grade.", style="red underline", justify="center")
+    no_submission(1)
 
 @app.command(help="Grade lesson 02 deliverable(s).")
 def lesson02(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
@@ -108,8 +110,36 @@ def lesson06(files: List[str] = generic_files_argument, verbose: bool = generic_
 
     assignment_feedback.console_print(console, verbose)
 
-@app.command(help="Grade lesson 01 deliverable(s).")
+@app.command(help="Grade lesson 07 deliverable(s).")
 def lesson07(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
-    console = Console()
-    console.rule("Lesson 07 Submission Grading")
-    console.print("No submission to grade.", style="red underline", justify="center")
+    no_submission(7)
+
+@app.command(help="Grade lesson 08 deliverable(s).")
+def lesson08(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    from cg112.graders.computer_specs_v4 import ComputerSpecsV4Grader
+
+    assignment_feedback: AssignmentFeedback = AssignmentFeedback([
+        ComputerSpecsV4Grader(files).rubric_feedback
+    ])
+
+    assignment_feedback.console_print(console, verbose)
+
+@app.command(help="Grade lesson 09 deliverable(s).")
+def lesson09(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    no_submission(9)
+
+@app.command(help="Grade lesson 10 deliverable(s).")
+def lesson10(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    pass
+
+@app.command(help="Grade lesson 11 deliverable(s).")
+def lesson11(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    no_submission(11)
+
+@app.command(help="Grade lesson 12 deliverable(s).")
+def lesson12(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    pass
+
+@app.command(help="Grade lesson 13 deliverable(s).")
+def lesson13(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
+    no_submission(13)
