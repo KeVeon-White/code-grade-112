@@ -117,10 +117,11 @@ def lesson07(files: List[str] = generic_files_argument, verbose: bool = generic_
 @app.command(help="Grade lesson 08 deliverable(s).")
 def lesson08(files: List[str] = generic_files_argument, verbose: bool = generic_verbose_argument):
     from cg112.graders.computer_specs_v4 import ComputerSpecsV4Grader
+    from cg112.graders.multiplication_quiz_v2 import MultiplicationQuizV2Grader
 
     assignment_feedback: AssignmentFeedback = AssignmentFeedback([
-        ComputerSpecsV4Grader(files).rubric_feedback
-    ])
+        ComputerSpecsV4Grader(files).rubric_feedback,
+        MultiplicationQuizV2Grader(files).rubric_feedback])
 
     assignment_feedback.console_print(console, verbose)
 
