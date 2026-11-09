@@ -17,3 +17,14 @@ class MultiplicationQuizV1Grader(Grader):
 
     def grade(self):
         pass
+
+"""
+Multiplication Quiz version 2: 35 points
+
+- Script runs without error, based on the previous version of the quiz: 5 points
+- User prompted correctly for the number of questions and multipliers: 5 points
+- Document updated with data before, during, and after the quiz using the json module: 5 points
+- Date formatted correctly for the file name: 5 points
+- Error handling where appropriate: 5 points
+- Proper logging throughout: 10 points
+"""

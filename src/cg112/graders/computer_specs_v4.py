@@ -17,3 +17,14 @@ class ComputerSpecsV4Grader(Grader):
 
     def grade(self):
         pass
+
+"""
+PC Specifications version 4: 35 points
+
+- Script runs without errors: 5 points
+- User prompted appropriately for each component multiples where appropriate: 5 points
+- Data saved in a dictionary or preferred data type: 5 points
+- Data put correctly into a CSV file user the csv module: 5 points
+- Error handling where appropriate: 5 points
+- Proper logging throughout: 10 points
+"""
