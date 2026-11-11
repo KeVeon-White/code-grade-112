@@ -47,8 +47,12 @@ def _check_for_update() -> str | None:
 
         if latest_response.url == this_response.url:
             return None
-        
-        return "[red]Update Required:\n\tVisit https://github.com/KeVeon-White/code-grade-112/releases/latest"
+
+        msg: str = "[red]Version Mismatch:\n\t"
+        msg += f"This Version: {__version__}\n\t"
+        msg += f"Latest Version: {latest_response.url.rsplit("/", 1)[-1]}\n\t"
+        msg += "Visit: https://github.com/KeVeon-White/code-grade-112/releases/latest"
+        return msg
     except requests.HTTPError:
         return "[yellow]Couldn't check for updates."
 
