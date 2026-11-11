@@ -51,8 +51,6 @@ def _check_for_update() -> str | None:
         return "[red]Update Required:\n\tVisit https://github.com/KeVeon-White/code-grade-112/releases/latest"
     except requests.HTTPError:
         return "[yellow]Couldn't check for updates."
-    except Exception as e:
-        return None
 
 @app.callback(no_args_is_help=True, epilog=_check_for_update())
 def main(
