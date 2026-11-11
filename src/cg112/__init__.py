@@ -1,8 +1,7 @@
 """Upmigrate package."""
 
 __app_name__ = "cg112"
-__version__ = "2627.2.1"
-__remote_version_url__ = "https://raw.githubusercontent.com/KeVeon-White/code-grade-112/refs/heads/main/src/cg112/__init__.py"
+__version__ = "2627.2.2"
 
 """
 Version Convention
