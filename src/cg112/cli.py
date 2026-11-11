@@ -1,10 +1,11 @@
 import typer
+import requests
 
 from pathlib import Path
 from rich.console import Console
 from typing import Dict, Iterable, List, Optional
 
-from cg112 import __app_name__, __version__
+from cg112 import __app_name__, __version__, __remote_version_url__
 from cg112.helpers import *
 from cg112.feedback import AssignmentFeedback, RubricFeedback, RubricCategory
 from cg112.styling import err_style, warn_style, print_err, print_warning
@@ -32,19 +33,43 @@ generic_verbose_argument: bool = typer.Option(
     False,
     "--verbose",
     "-v",
-    help="Shows the rubric criteria in addition to point values.",)
+    help="Shows the rubric criteria in addition to point values, feedback, and descriptions.",)
 
 def _version_callback(value: bool) -> None:
     if value:
         print(f"{__app_name__} v{__version__}")
         raise typer.Exit()
 
-@app.callback(no_args_is_help=True)
+def _check_for_update() -> str | None:
+    try:
+        response = requests.get(__remote_version_url__)
+        response.raise_for_status()
+
+        this_version: str = __version__
+        exec(response.text, globals=globals())
+
+        if this_version == __version__:
+            return None
+        
+        this_yr, this_sm, this_vn = this_version.split(".")
+        yr, sm, vn = __version__.split(".")
+
+        if this_yr < yr: return "[red]Update Required:\n\tThis tool is from a previous academic year."
+        elif this_sm < sm: return "[red]Update Required:\n\tThis tool is from a previous semester."
+        elif this_vn < vn: return "[red]Update Required:\n\tThis tool is out of date for the current semester."
+
+        return "[red]You somehow have a newer version of this tool."
+    except requests.HTTPError:
+        return "[yellow]Couldn't check for updates."
+    except Exception as e:
+        return None
+
+@app.callback(no_args_is_help=True, epilog=_check_for_update())
 def main(
     version: Optional[bool] = typer.Option(
         None,
         "--version",
-        "-v",
+        "-V",
         help="Show the application's version and exit.",
         callback=_version_callback,
         is_eager=True,
