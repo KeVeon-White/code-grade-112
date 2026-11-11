@@ -22,7 +22,7 @@ wheels = [
 
 [[package]]
 name = "cg112"
-version = "0.1.0"
+version = "2627.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "requests" },
