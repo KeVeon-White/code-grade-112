@@ -1,6 +1,6 @@
 """Main entry point for upmigrate CLI."""
 
-from . import __app_name__, cli
+from cg112 import __app_name__, cli
 
 
 def main():

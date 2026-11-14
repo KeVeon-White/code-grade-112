@@ -11,7 +11,7 @@ class ComputerSpecsV4Grader(Grader):
             "Computer Specs v4", files,
             "computer_specs_v4.py",
             hex_value="TEMPORARY",  # TODO
-            no_error_weight=5.0,    # TODO
+            no_error_weight=5.0,    # TODO 
             *args, **kwargs
         )
 
